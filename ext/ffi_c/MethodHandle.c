@@ -41,10 +41,6 @@
 #define METHOD_CLOSURE ffi_closure
 #define METHOD_PARAMS void**
 
-struct MethodHandle {
-    Closure* closure;
-};
-
 static ffi_type* methodHandleParamTypes[] = {
     &ffi_type_sint,
     &ffi_type_pointer,
@@ -65,17 +61,16 @@ attached_method_invoke(ffi_cif* cif, void* mretval, METHOD_PARAMS parameters, vo
     *(VALUE *) mretval = (*fnInfo->invoke)(argc, argv, handle->function, fnInfo);
 }
 
-MethodHandle*
+MethodHandle
 rbffi_MethodHandle_Alloc(FunctionType* fnInfo, void* function)
 {
     ffi_status ffiStatus;
-    MethodHandle* handle;
+    MethodHandle handle;
     Closure* closure;
 
     closure = rbffi_Closure_Alloc();
     if (closure == NULL) {
         rb_raise(rb_eNoMemError, "failed to allocate closure from pool");
-        return NULL;
     }
     closure->info = fnInfo;
     closure->function = function;
@@ -87,11 +82,9 @@ rbffi_MethodHandle_Alloc(FunctionType* fnInfo, void* function)
         closure->libffi_trampoline);
     if (ffiStatus != FFI_OK) {
         rb_raise(rb_eRuntimeError, "ffi_prep_closure_loc failed.  status=%#x", ffiStatus);
-        return false;
     }
 
-    handle = xcalloc(1, sizeof(*handle));
-    handle->closure = closure;
+    handle.closure = closure;
 
     return handle;
 }
@@ -99,10 +92,9 @@ rbffi_MethodHandle_Alloc(FunctionType* fnInfo, void* function)
 void
 rbffi_MethodHandle_Free(MethodHandle* handle)
 {
-    if (handle != NULL) {
+    if (handle->closure != NULL) {
         rbffi_Closure_Free(handle->closure);
     }
-    xfree(handle);
 }
 
 void*

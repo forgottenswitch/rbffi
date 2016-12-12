@@ -74,7 +74,7 @@
 typedef struct Function_ {
     Pointer base;
     FunctionType* info;
-    MethodHandle* methodHandle;
+    MethodHandle methodHandle;
     bool autorelease;
     Closure* closure;
     VALUE rbProc;
@@ -174,9 +174,9 @@ function_mark(Function *fn)
 static void
 function_free(Function *fn)
 {
-    if (fn->methodHandle != NULL) {
-        rbffi_MethodHandle_Free(fn->methodHandle);
-    }
+    /*if (fn->methodHandle != NULL) {*/
+        rbffi_MethodHandle_Free(&fn->methodHandle);
+    /*}*/
 
     if (fn->closure != NULL && fn->autorelease) {
         rbffi_Closure_Free(fn->closure);
@@ -395,9 +395,9 @@ function_attach(VALUE self, VALUE module, VALUE name)
         return Qnil;
     }
 
-    if (fn->methodHandle == NULL) {
+    /*if (fn->methodHandle == NULL) {*/
         fn->methodHandle = rbffi_MethodHandle_Alloc(fn->info, fn->base.memory.address);
-    }
+    /*}*/
 
     /*
      * Stash the Function in a module variable so it does not get garbage collected
@@ -406,11 +406,11 @@ function_attach(VALUE self, VALUE module, VALUE name)
     rb_cv_set(module, var, self);
 
     rb_define_singleton_method(module, StringValueCStr(name),
-            rbffi_MethodHandle_CodeAddress(fn->methodHandle), -1);
+            rbffi_MethodHandle_CodeAddress(&fn->methodHandle), -1);
 
 
     rb_define_method(module, StringValueCStr(name),
-            rbffi_MethodHandle_CodeAddress(fn->methodHandle), -1);
+            rbffi_MethodHandle_CodeAddress(&fn->methodHandle), -1);
 
     return self;
 }

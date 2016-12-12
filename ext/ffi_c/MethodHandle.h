@@ -37,12 +37,15 @@ extern "C" {
 #include <ruby.h>
 #include "Function.h"
 
+struct MethodHandle {
+    Closure *closure;
+};
     
 typedef struct MethodHandlePool MethodHandlePool;
 typedef struct MethodHandle MethodHandle;
 
 
-MethodHandle* rbffi_MethodHandle_Alloc(FunctionType* fnInfo, void* function);
+MethodHandle rbffi_MethodHandle_Alloc(FunctionType* fnInfo, void* function);
 void rbffi_MethodHandle_Free(MethodHandle* handle);
 void* rbffi_MethodHandle_CodeAddress(MethodHandle* handle);
 void rbffi_MethodHandle_Init(VALUE module);
