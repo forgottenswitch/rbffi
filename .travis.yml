@@ -3,6 +3,7 @@ addons:
   apt:
     packages:
     - libgmp-dev    # this is needed for ruby-2.1.10 and ruby-head on linux
+    - texinfo       # required by libffi
 language: ruby
 before_install:
   - gem install bundler

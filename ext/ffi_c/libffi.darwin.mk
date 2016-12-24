@@ -28,6 +28,10 @@ LIBFFI_BUILD_DIR = $(BUILD_DIR)/libffi-$(arch)
 # Just build the one (default) architecture
 $(LIBFFI):		
 	@mkdir -p "$(LIBFFI_BUILD_DIR)" "$(@D)"
+	@if [ ! -f "$(LIBFFI_SRC_DIR)"/configure ]; then \
+	    echo "Generating configure in libffi"; \
+	    cd "$(LIBFFI_SRC_DIR)" && autoreconf -f -i; \
+	fi
 	@if [ ! -f "$(LIBFFI_BUILD_DIR)"/Makefile ]; then \
 	    echo "Configuring libffi"; \
 	    cd "$(LIBFFI_BUILD_DIR)" && \
@@ -42,6 +46,10 @@ LIBTARGETS = $(foreach arch,$(ARCHES),"$(BUILD_DIR)"/libffi-$(arch)/.libs/libffi
 # Build a fat binary and assemble
 build_ffi = \
 	mkdir -p "$(BUILD_DIR)"/libffi-$(1); \
+	(if [ ! -f "$(LIBFFI_SRC_DIR)"/configure ]; then \
+	    echo "Generating configure in libffi"; \
+	    cd "$(LIBFFI_SRC_DIR)" && autoreconf -f -i; \
+	fi); \
 	(if [ ! -f "$(BUILD_DIR)"/libffi-$(1)/Makefile ]; then \
 	    echo "Configuring libffi for $(1)"; \
 	    cd "$(BUILD_DIR)"/libffi-$(1) && \

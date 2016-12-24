@@ -24,6 +24,10 @@ $(OBJS):	${LIBFFI}
 
 $(LIBFFI):		
 	@mkdir -p ${LIBFFI_BUILD_DIR}
+	@if [ ! -f "$(LIBFFI_SRC_DIR)"/configure ]; then \
+	    echo "Generating configure in libffi"; \
+	    cd "$(LIBFFI_SRC_DIR)" && autoreconf -f -i; \
+	fi
 	@if [ ! -f ${LIBFFI_BUILD_DIR}/Makefile ]; then \
 	    echo "Configuring libffi"; \
 	    cd ${LIBFFI_BUILD_DIR} && \
